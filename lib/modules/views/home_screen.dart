@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tanjun_app/ui/widgets/fab.dart';
-import 'package:tanjun_app/utils/app_colors.dart';
-import 'package:tanjun_app/utils/task_strings.dart';
+
+import 'package:tanjun_app/core/utils/app_colors.dart';
+import 'package:tanjun_app/core/utils/task_strings.dart';
+import 'package:tanjun_app/modules/viewmodels/fab.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 30,
                     child: CircularProgressIndicator(
                       value: 1 / 3,
-                      backgroundColor: AppColors.secondaryColor,
+                      backgroundColor: AppColors.circleColor,
                       valueColor: AlwaysStoppedAnimation(AppColors.buttonColor),
                     ),
                   ),
@@ -80,31 +81,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   return AnimatedContainer(
                     margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                     duration: const Duration(milliseconds: 600),
                     decoration: BoxDecoration(
                       color: AppColors.primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: ListTile(
-                      leading: GestureDetector(
-                        onTap: () {
-                          // check or uncheck
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 600),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: AppColors.primaryColor, width: .8),
-                          ),
-                          child: const Icon(Icons.check, color: Colors.white),
-                        ),
+                    child: const ListTile(
+                      leading: Padding(
+                        padding: EdgeInsets.only(top: 0.1, bottom: 30),
+                        child: TaskWidget(),
                       ),
                       // title
-                      title: const Padding(
-                        padding: EdgeInsets.only(bottom: 5, top: 3),
+                      title: Padding(
+                        padding: EdgeInsets.only(bottom: 2, top: 6),
                         child: Text(
                           "Done",
                           style: TextStyle(
@@ -114,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       // description
-                      subtitle: const Column(
+                      subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -158,6 +148,30 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class TaskWidget extends StatelessWidget {
+  const TaskWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // check or uncheck
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 600),
+        decoration: BoxDecoration(
+          color: AppColors.primaryColor,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.primaryColor, width: .8),
+        ),
+        child: const Icon(Icons.check, color: Colors.white),
       ),
     );
   }
