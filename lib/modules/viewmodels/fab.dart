@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tanjun_app/utils/app_colors.dart';
+import 'package:tanjun_app/core/utils/app_colors.dart';
 
 class Fab extends StatelessWidget {
   const Fab({

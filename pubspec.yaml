@@ -103,9 +103,9 @@ flutter:
   # see https://flutter.dev/to/font-from-package
 
   assets:
-    - lib/assets/images/ic_tanjun_app.png
+    - assets/images/ic_tanjun_app.png
 
 flutter_icons:
   android: true
   ios: true
-  image_path: "lib/assets/images/ic_tanjun_app.png"
+  image_path: "assets/images/ic_tanjun_app.png"

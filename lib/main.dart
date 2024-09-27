@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tanjun_app/ui/screens/home_screen.dart';
+import 'package:tanjun_app/modules/views/home_screen.dart';
 
 void main() {
   runApp(const TanjunApp());
