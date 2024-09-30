@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:tanjun_app/modules/viewmodels/fab.dart';
 import 'package:tanjun_app/core/utils/app_colors.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
-import 'package:tanjun_app/modules/viewmodels/fab.dart';
+import 'package:tanjun_app/widgets/task_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +12,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final List<String> tasks = List.generate(20, (index) => 'Task $index');
+
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
@@ -76,70 +78,82 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: 20,
+                itemCount: tasks.length,
                 scrollDirection: Axis.vertical,
                 itemBuilder: (context, index) {
-                  return AnimatedContainer(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
-                    duration: const Duration(milliseconds: 600),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+                  return Dismissible(
+                    key: Key(tasks[index]),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.delete, color: Colors.white),
                     ),
-                    child: const ListTile(
-                      leading: Padding(
-                        padding: EdgeInsets.only(top: 0.1, bottom: 30),
-                        child: TaskWidget(),
+                    onDismissed: (direction) {
+                      setState(() {
+                        tasks.removeAt(index); // remove the item from the list
+                      });
+                    },
+                    child: AnimatedContainer(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 5),
+                      duration: const Duration(milliseconds: 600),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      // title
-                      title: Padding(
-                        padding: EdgeInsets.only(bottom: 2, top: 6),
-                        child: Text(
-                          "Done",
-                          style: TextStyle(
-                              color: AppColors.textColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
+                      child: ListTile(
+                        leading: Padding(
+                          padding: const EdgeInsets.only(top: 0.1, bottom: 30),
+                          child: TaskWidget(index: index),
                         ),
-                      ),
-                      // description
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Description",
+                        title: const Padding(
+                          padding: EdgeInsets.only(bottom: 2, top: 6),
+                          child: Text(
+                            "Done",
                             style: TextStyle(
-                                fontSize: 12,
                                 color: AppColors.textColor,
-                                fontWeight: FontWeight.w300),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
                           ),
-                          // date
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: EdgeInsets.only(bottom: 10, top: 10),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    "Time",
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        color: AppColors.textColor,
-                                        fontWeight: FontWeight.w300),
-                                  ),
-                                  Text(
-                                    "Date",
-                                    style: TextStyle(
-                                        fontSize: 11,
-                                        color: AppColors.textColor,
-                                        fontWeight: FontWeight.w300),
-                                  ),
-                                ],
+                        ),
+                        subtitle: const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Description",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textColor,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: EdgeInsets.only(bottom: 10, top: 10),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      "Time",
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          color: AppColors.textColor,
+                                          fontWeight: FontWeight.w300),
+                                    ),
+                                    Text(
+                                      "Date",
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.textColor,
+                                          fontWeight: FontWeight.w300),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -148,30 +162,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class TaskWidget extends StatelessWidget {
-  const TaskWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // check or uncheck
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 600),
-        decoration: BoxDecoration(
-          color: AppColors.primaryColor,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.primaryColor, width: .8),
-        ),
-        child: const Icon(Icons.check, color: Colors.white),
       ),
     );
   }
