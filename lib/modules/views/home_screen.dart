@@ -1,4 +1,7 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+import 'package:tanjun_app/core/utils/constants.dart';
 import 'package:tanjun_app/modules/viewmodels/fab.dart';
 import 'package:tanjun_app/core/utils/app_colors.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
@@ -12,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String> tasks = List.generate(20, (index) => 'Task $index');
+  final List<String> tasks = List.generate(0, (index) => 'Task $index');
 
   @override
   Widget build(BuildContext context) {
@@ -77,88 +80,119 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: tasks.length,
-                scrollDirection: Axis.vertical,
-                itemBuilder: (context, index) {
-                  return Dismissible(
-                    key: Key(tasks[index]),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    onDismissed: (direction) {
-                      setState(() {
-                        tasks.removeAt(index); // remove the item from the list
-                      });
-                    },
-                    child: AnimatedContainer(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 5),
-                      duration: const Duration(milliseconds: 600),
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ListTile(
-                        leading: Padding(
-                          padding: const EdgeInsets.only(top: 0.1, bottom: 30),
-                          child: TaskWidget(index: index),
-                        ),
-                        title: const Padding(
-                          padding: EdgeInsets.only(bottom: 2, top: 6),
-                          child: Text(
-                            "Done",
-                            style: TextStyle(
-                                color: AppColors.textColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
+              child: tasks.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: tasks.length,
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (context, index) {
+                        return Dismissible(
+                          key: Key(tasks[index]),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child:
+                                const Icon(Icons.delete, color: Colors.white),
                           ),
-                        ),
-                        subtitle: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Description",
-                              style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textColor,
-                                  fontWeight: FontWeight.w300),
+                          onDismissed: (direction) {
+                            setState(() {
+                              tasks.removeAt(index);
+                            });
+                          },
+                          child: AnimatedContainer(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 5),
+                            duration: const Duration(milliseconds: 600),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Padding(
-                                padding: EdgeInsets.only(bottom: 10, top: 10),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      "Time",
-                                      style: TextStyle(
-                                          fontSize: 13,
-                                          color: AppColors.textColor,
-                                          fontWeight: FontWeight.w300),
-                                    ),
-                                    Text(
-                                      "Date",
-                                      style: TextStyle(
-                                          fontSize: 11,
-                                          color: AppColors.textColor,
-                                          fontWeight: FontWeight.w300),
-                                    ),
-                                  ],
+                            child: ListTile(
+                              leading: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 0.1, bottom: 30),
+                                child: TaskWidget(index: index),
+                              ),
+                              title: const Padding(
+                                padding: EdgeInsets.only(bottom: 2, top: 6),
+                                child: Text(
+                                  "Done",
+                                  style: TextStyle(
+                                      color: AppColors.textColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ),
+                              subtitle: const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Description",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textColor,
+                                        fontWeight: FontWeight.w300),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.only(bottom: 10, top: 10),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            "Time",
+                                            style: TextStyle(
+                                                fontSize: 13,
+                                                color: AppColors.textColor,
+                                                fontWeight: FontWeight.w300),
+                                          ),
+                                          Text(
+                                            "Date",
+                                            style: TextStyle(
+                                                fontSize: 11,
+                                                color: AppColors.textColor,
+                                                fontWeight: FontWeight.w300),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        );
+                      },
+                    )
+                  : SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FadeIn(
+                            child: SizedBox(
+                              width: 300,
+                              height: 300,
+                              child: Lottie.asset(
+                                lottieURL,
+                                animate: tasks.isNotEmpty ? false : true,
+                              ),
+                            ),
+                          ),
+                          FadeInUp(
+                            child: const Text(
+                              TaskStrings.allTasksCompleted,
+                              style: TextStyle(
+                                color: Color.fromARGB(157, 33, 58, 87),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),

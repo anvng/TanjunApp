@@ -104,6 +104,7 @@ flutter:
 
   assets:
     - assets/images/ic_tanjun_app.png
+    - assets/lottie/check.json
 
 flutter_icons:
   android: true
