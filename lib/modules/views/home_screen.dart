@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tanjun_app/core/utils/constants.dart';
+import 'package:tanjun_app/modules/viewmodels/custom_drawer.dart';
 import 'package:tanjun_app/modules/viewmodels/fab.dart';
 import 'package:tanjun_app/core/utils/app_colors.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
@@ -35,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         key: drawerKey,
         sliderOpenSize: 250,
         appBar: BarScreen(drawerKey: drawerKey),
-        slider: _buildMenu(),
+        slider: CustomDrawer(),
         child: SizedBox(
           width: double.infinity,
           height: double.infinity,
@@ -226,17 +227,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
-
-Widget _buildMenu() {
-  return Container(
-    color: AppColors.primaryColor,
-    child: const Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('Menu Item 1', style: TextStyle(color: Colors.white)),
-        Text('Menu Item 2', style: TextStyle(color: Colors.white)),
-      ],
-    ),
-  );
 }
