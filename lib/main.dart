@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tanjun_app/modules/views/home_screen.dart';
+import 'package:tanjun_app/modules/views/task_screen.dart';
 
 void main() {
   runApp(const TanjunApp());
@@ -15,7 +15,7 @@ class TanjunApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const HomeScreen(),
+        home: const TaskScreen(),
         debugShowCheckedModeBanner: false);
   }
 }
