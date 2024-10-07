@@ -2,12 +2,12 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:lottie/lottie.dart';
-import 'package:tanjun_app/core/utils/constants.dart';
-import 'package:tanjun_app/widgets/custom_drawer_widget.dart';
-import 'package:tanjun_app/widgets/fab_widget.dart';
 import 'package:tanjun_app/core/utils/app_colors.dart';
+import 'package:tanjun_app/core/utils/constants.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
+import 'package:tanjun_app/modules/viewmodels/custom_drawer.dart';
 import 'package:tanjun_app/modules/views/bar_screen.dart';
+import 'package:tanjun_app/widgets/fab_widget.dart';
 import 'package:tanjun_app/widgets/task_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,7 +18,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // final List<String> tasks = List.generate(0, (index) => 'Task $index');
   final List<String> tasks = ['Comp', 'Rev', 'Sub'];
   final GlobalKey<SliderDrawerState> drawerKey = GlobalKey<SliderDrawerState>();
 
@@ -29,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
       // fab
-      floatingActionButton: const Fab(),
+      floatingActionButton: Fab(drawerKey: drawerKey),
 
       // body
       body: SliderDrawer(
