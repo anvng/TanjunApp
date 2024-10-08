@@ -1,35 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker_fork.dart';
 import 'package:tanjun_app/core/utils/app_colors.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
 
 class DateTimeSelectionWidget extends StatelessWidget {
   const DateTimeSelectionWidget({
     super.key,
+    required this.onTap,
+    required this.title,
   });
+
+  final VoidCallback onTap;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return Builder(
       builder: (BuildContext newContext) {
         return GestureDetector(
-          onTap: () {
-            showModalBottomSheet(
-              context: newContext,
-              builder: (_) => SizedBox(
-                height: 280,
-                child: TimePickerWidget(
-                  // initial time
-                  onChange: (_, __) {},
-                  dateFormat: 'HH:mm',
-                  onConfirm: (dateTime, _) {},
-                ),
-              ),
-            );
-          },
+          onTap: onTap,
           child: Container(
             width: double.infinity,
-            margin: const EdgeInsets.all(20),
+            margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
             height: 50,
             decoration: BoxDecoration(
               color: AppColors.whiteColor,
@@ -56,7 +47,7 @@ class DateTimeSelectionWidget extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      "Time",
+                      title,
                       style: TextStyle(color: Colors.grey.shade500),
                     ),
                   ),

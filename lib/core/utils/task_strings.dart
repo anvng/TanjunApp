@@ -1,9 +1,10 @@
 class TaskStrings {
   static const String addNote = "Add Note";
-  static const String addTask = "Add Task";
+  static const String addTask = " Add Task ";
   static const String updateTask = "Update Task";
   static const String mainTitle = "My Tasks";
   static const String deleteTask = "Delete Task";
+  static const String cancelTask = "Cancel Task";
   static const String oopsMessage = "Oops!";
   static const String confirmationMessage = "Are you sure?";
   static const String taskDeletedMessage = "This task was deleted";
