@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
+import 'package:tanjun_app/core/utils/constants.dart';
 
 class BarScreen extends StatefulWidget {
   const BarScreen({super.key, required this.drawerKey});
@@ -63,10 +64,14 @@ class _BarScreenState extends State<BarScreen>
                     size: 30,
                   )),
             ),
+
+            // trash all buttons
             Padding(
               padding: const EdgeInsets.only(right: 20),
               child: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    deleteAllTasksWarning(context);
+                  },
                   icon: const Icon(
                     CupertinoIcons.trash_fill,
                     size: 30,
