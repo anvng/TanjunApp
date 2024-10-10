@@ -21,7 +21,7 @@ Future<void> main() async {
     final taskDate =
         DateTime(task.atTime.year, task.atTime.month, task.atTime.day);
     if (taskDate.isBefore(today)) {
-      task.delete(); // Make sure task deletion works as expected
+      task.delete();
     }
   }
 
