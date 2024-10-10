@@ -1,10 +1,11 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tanjun_app/core/utils/app_colors.dart';
 import 'package:tanjun_app/core/utils/constants.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
+import 'package:tanjun_app/modules/models/task_model.dart';
 import 'package:tanjun_app/modules/viewmodels/custom_drawer.dart';
 import 'package:tanjun_app/modules/views/bar_screen.dart';
 import 'package:tanjun_app/widgets/fab_widget.dart';
@@ -18,16 +19,45 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String> tasks = ['Comp', 'Rev', 'Sub'];
+  final List<TaskModel> tasks = [
+    TaskModel(
+      id: 1,
+      title: 'Complete homework',
+      description: 'Math homework needs to be done.',
+      atTime: DateTime.now(),
+      atDate: DateTime.now(),
+      isCompleted: false,
+    ),
+    TaskModel(
+      id: 2,
+      title: 'Review chapter 2',
+      description: 'Revise the physics notes.',
+      atTime: DateTime.now(),
+      atDate: DateTime.now(),
+      isCompleted: false,
+    ),
+    TaskModel(
+      id: 3,
+      title: 'Complete project proposal',
+      description: 'Complete the project proposal.',
+      atTime: DateTime.now(),
+      atDate: DateTime.now(),
+      isCompleted: false,
+    ),
+  ];
+
   final GlobalKey<SliderDrawerState> drawerKey = GlobalKey<SliderDrawerState>();
 
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
+    // count uncompleted tasks
+    int incompleteTasksCount = tasks.where((task) => !task.isCompleted).length;
+
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      // fab
+      // Fab
       floatingActionButton: Fab(drawerKey: drawerKey),
 
       // body
@@ -41,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
           height: double.infinity,
           child: Column(
             children: [
+              // header with progress indicator
               Container(
                 margin: const EdgeInsets.only(top: 20),
                 width: double.infinity,
@@ -49,14 +80,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(
+                    SizedBox(
                       width: 30,
                       height: 30,
                       child: CircularProgressIndicator(
-                        value: 1 / 3,
+                        value: tasks.isNotEmpty
+                            ? incompleteTasksCount / tasks.length
+                            : 0.0,
                         backgroundColor: AppColors.circleColor,
                         valueColor:
-                            AlwaysStoppedAnimation(AppColors.buttonColor),
+                            const AlwaysStoppedAnimation(AppColors.buttonColor),
                       ),
                     ),
                     const SizedBox(width: 25),
@@ -73,8 +106,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 3),
+                        // view count of uncompleted tasks
                         Text(
-                          "1 of 3 tasks",
+                          "$incompleteTasksCount of ${tasks.length} tasks",
                           style: textTheme.titleMedium?.copyWith(
                             color: AppColors.textColor.withOpacity(0.5),
                             fontSize: 16,
@@ -99,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         scrollDirection: Axis.vertical,
                         itemBuilder: (context, index) {
                           return Dismissible(
-                            key: Key(tasks[index]),
+                            key: Key(tasks[index].id.toString()),
                             direction: DismissDirection.endToStart,
                             background: Container(
                               color: Colors.red,
@@ -129,52 +163,83 @@ class _HomeScreenState extends State<HomeScreen> {
                                   horizontal: 14, vertical: 5),
                               duration: const Duration(milliseconds: 600),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryColor.withOpacity(0.1),
+                                color: tasks[index].isCompleted
+                                    ? AppColors.primaryColor.withOpacity(0.3)
+                                    : AppColors.primaryColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: ListTile(
+                                onTap: () {
+                                  // toggle completion status
+                                  setState(() {
+                                    tasks[index].isCompleted =
+                                        !tasks[index].isCompleted;
+                                  });
+                                },
                                 leading: Padding(
                                   padding: const EdgeInsets.only(
                                       top: 0.1, bottom: 30),
-                                  child: TaskWidget(index: index),
-                                ),
-                                title: const Padding(
-                                  padding: EdgeInsets.only(bottom: 2, top: 6),
-                                  child: Text(
-                                    "Done",
-                                    style: TextStyle(
-                                        color: AppColors.textColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
+                                  child: TaskWidget(
+                                    task: tasks[index],
+                                    onToggle: (isCompleted) {
+                                      // update task status
+                                      setState(() {
+                                        tasks[index].isCompleted = isCompleted;
+                                      });
+                                    },
                                   ),
                                 ),
-                                subtitle: const Column(
+                                title: Padding(
+                                  padding:
+                                      const EdgeInsets.only(bottom: 2, top: 6),
+                                  child: Text(
+                                    tasks[index].title,
+                                    style: TextStyle(
+                                      color: tasks[index].isCompleted
+                                          ? AppColors.buttonColor
+                                          : AppColors.textColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      decoration: tasks[index].isCompleted
+                                          ? TextDecoration.lineThrough
+                                          : TextDecoration.none,
+                                    ),
+                                  ),
+                                ),
+                                subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Description",
+                                      tasks[index].description,
                                       style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.textColor,
-                                          fontWeight: FontWeight.w300),
+                                        fontSize: 12,
+                                        color: tasks[index].isCompleted
+                                            ? AppColors.buttonColor
+                                            : AppColors.textColor,
+                                        fontWeight: FontWeight.w300,
+                                        decoration: tasks[index].isCompleted
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                      ),
                                     ),
                                     Align(
                                       alignment: Alignment.centerRight,
                                       child: Padding(
-                                        padding: EdgeInsets.only(
+                                        padding: const EdgeInsets.only(
                                             bottom: 10, top: 10),
                                         child: Column(
                                           children: [
                                             Text(
-                                              "Time",
-                                              style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: AppColors.textColor,
-                                                  fontWeight: FontWeight.w300),
+                                              tasks[index].atTime.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: AppColors.textColor,
+                                                fontWeight: FontWeight.w300,
+                                              ),
                                             ),
                                             Text(
-                                              "Date",
-                                              style: TextStyle(
+                                              tasks[index].atDate.toString(),
+                                              style: const TextStyle(
                                                   fontSize: 11,
                                                   color: AppColors.textColor,
                                                   fontWeight: FontWeight.w300),
@@ -205,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
-                            // subtitle
+                            // description
                             FadeInUp(
                               child: const Text(
                                 TaskStrings.allTasksCompleted,
