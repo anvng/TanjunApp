@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_date_picker_fork/flutter_cupertino_date_picker_fork.dart';
-import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:tanjun_app/core/utils/app_colors.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
+import 'package:tanjun_app/modules/models/task_model.dart';
 import 'package:tanjun_app/modules/viewmodels/rep_text_field.dart';
 import 'package:tanjun_app/widgets/date_time_selection_widget.dart';
 import 'package:tanjun_app/widgets/task_bar_widget.dart';
 
 class TaskScreen extends StatefulWidget {
-  const TaskScreen(
-      {super.key, required GlobalKey<SliderDrawerState> drawerKey});
+  const TaskScreen({
+    super.key,
+    required this.titleTaskController,
+    required this.descriptionTaskController,
+    required this.task,
+  });
+
+  final TextEditingController? titleTaskController;
+  final TextEditingController? descriptionTaskController;
+  final TaskModel? task;
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  final TextEditingController controller = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final _titleTaskController = TextEditingController();
+  final _descriptionTaskController = TextEditingController();
+
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+
+  bool isTaskAlreadyExists() {
+    return _titleTaskController.text.isEmpty &&
+        _descriptionTaskController.text.isEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,19 +41,20 @@ class _TaskScreenState extends State<TaskScreen> {
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
         appBar: const PreferredSize(
-            preferredSize: Size.fromHeight(kToolbarHeight),
-            child: TaskBarWidget()),
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: TaskBarWidget(),
+        ),
         body: SizedBox(
           width: double.infinity,
           height: double.infinity,
           child: Column(
             children: [
-              // top side
+              // top side texts
               _buildTopSideTexts(),
               // main task screen
               _buildMainTaskScreenActivity(context),
               // bottom side buttons
-              _buildBottomSideButtons()
+              _buildBottomSideButtons(),
             ],
           ),
         ),
@@ -52,7 +69,7 @@ class _TaskScreenState extends State<TaskScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // delete current task
+          // cancel button
           MaterialButton(
             onPressed: () {},
             color: AppColors.secondaryColor,
@@ -73,7 +90,7 @@ class _TaskScreenState extends State<TaskScreen> {
               ],
             ),
           ),
-          // add and save current task
+          // save button
           MaterialButton(
             onPressed: () {},
             color: AppColors.buttonColor,
@@ -112,18 +129,20 @@ class _TaskScreenState extends State<TaskScreen> {
             child: Text(
               TaskStrings.taskTitleHint,
               style: TextStyle(
-                  fontSize: 18,
-                  color: AppColors.textHintColor,
-                  fontWeight: FontWeight.w300),
+                fontSize: 18,
+                color: AppColors.textHintColor,
+                fontWeight: FontWeight.w300,
+              ),
             ),
           ),
-
-          // title
-          RepTextField(titleController: controller),
-          const SizedBox(height: 40),
-          // description
+          // title input
           RepTextField(
-            titleController: _descriptionController,
+            titleController: _titleTaskController,
+          ),
+          const SizedBox(height: 40),
+          // description input
+          RepTextField(
+            titleController: _descriptionTaskController,
             isForDescription: true,
           ),
           // time select
@@ -134,27 +153,41 @@ class _TaskScreenState extends State<TaskScreen> {
                 builder: (_) => SizedBox(
                   height: 280,
                   child: TimePickerWidget(
-                    // initial time
-                    onChange: (_, __) {},
-                    dateFormat: 'HH:mm',
-                    onConfirm: (dateTime, _) {},
+                    initDateTime: DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
+                    ),
+                    onConfirm: (dateTime, _) {
+                      setState(() {
+                        selectedTime = TimeOfDay.fromDateTime(dateTime);
+                      });
+                    },
                   ),
                 ),
               );
             },
-            title: TaskStrings.timeLabel,
+            // show current time
+            title: selectedTime.format(context),
           ),
           // date select
           DateTimeSelectionWidget(
             onTap: () {
               DatePicker.showDatePicker(
                 context,
-                maxDateTime: DateTime(2050, 23, 1),
+                maxDateTime: DateTime(2050, 12, 31),
                 minDateTime: DateTime.now(),
-                onConfirm: (dateTime, _) {},
+                onConfirm: (dateTime, _) {
+                  setState(() {
+                    selectedDate = dateTime;
+                  });
+                },
               );
             },
-            title: TaskStrings.dateLabel,
+            // show current date
+            title: "${selectedDate.toLocal()}".split(' ')[0],
           ),
         ],
       ),
@@ -177,9 +210,11 @@ class _TaskScreenState extends State<TaskScreen> {
             ),
           ),
           RichText(
-            text: const TextSpan(
-              text: TaskStrings.addNewTask,
-              style: TextStyle(
+            text: TextSpan(
+              text: isTaskAlreadyExists()
+                  ? TaskStrings.addTask
+                  : TaskStrings.updateTask,
+              style: const TextStyle(
                 color: AppColors.textColor,
                 fontWeight: FontWeight.w400,
                 fontSize: 33,

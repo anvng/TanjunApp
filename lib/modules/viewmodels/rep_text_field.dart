@@ -7,10 +7,14 @@ class RepTextField extends StatelessWidget {
     super.key,
     required TextEditingController titleController,
     this.isForDescription = false,
+    this.onSubmitted,
+    this.onChanged,
   }) : controller = titleController;
 
   final TextEditingController controller;
   final bool isForDescription;
+  final Function(String)? onSubmitted;
+  final Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
