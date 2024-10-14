@@ -6,39 +6,107 @@ import 'package:tanjun_app/modules/models/task_model.dart';
 import 'package:tanjun_app/modules/viewmodels/rep_text_field.dart';
 import 'package:tanjun_app/widgets/date_time_selection_widget.dart';
 import 'package:tanjun_app/widgets/task_bar_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class TaskScreen extends StatefulWidget {
   const TaskScreen({
     super.key,
     required this.titleTaskController,
     required this.descriptionTaskController,
-    required this.task,
+    required this.tasks,
   });
 
   final TextEditingController? titleTaskController;
   final TextEditingController? descriptionTaskController;
-  final TaskModel? task;
+  final TaskModel? tasks;
 
   @override
   State<TaskScreen> createState() => _TaskScreenState();
 }
 
 class _TaskScreenState extends State<TaskScreen> {
-  final _titleTaskController = TextEditingController();
-  final _descriptionTaskController = TextEditingController();
+  late TextEditingController _titleTaskController;
+  late TextEditingController _descriptionTaskController;
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
 
-  bool isTaskAlreadyExists() {
-    return _titleTaskController.text.isEmpty &&
-        _descriptionTaskController.text.isEmpty;
+  @override
+  void initState() {
+    super.initState();
+    _titleTaskController =
+        widget.titleTaskController ?? TextEditingController();
+    _descriptionTaskController =
+        widget.descriptionTaskController ?? TextEditingController();
+
+    if (widget.tasks != null) {
+      _titleTaskController.text = widget.tasks!.title;
+      _descriptionTaskController.text = widget.tasks!.description;
+      selectedDate = widget.tasks!.atDate;
+      selectedTime = TimeOfDay.fromDateTime(widget.tasks!.atTime);
+    }
   }
 
-  // format date
-  String formatDate(DateTime date) {
-    final dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-    return '${dayOfWeek[date.weekday - 1]}, ${date.day}/${date.month}/${date.year}';
+  @override
+  void dispose() {
+    _titleTaskController.dispose();
+    _descriptionTaskController.dispose();
+    super.dispose();
+  }
+
+  void _saveTask() {
+    final title = _titleTaskController.text.trim();
+    final description = _descriptionTaskController.text.trim();
+
+    if (!_validateInputs(title, description)) return;
+
+    final task = TaskModel(
+      id: widget.tasks?.id ?? const Uuid().v4(),
+      title: title,
+      description: description,
+      atTime: DateTime(
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        selectedTime.hour,
+        selectedTime.minute,
+      ),
+      atDate: selectedDate,
+      isCompleted: false,
+    );
+
+    // Implement my task saving logic here
+
+    // Close the screen after saving
+    Navigator.pop(context);
+  }
+
+  bool _validateInputs(String title, String description) {
+    if (title.isEmpty || description.isEmpty) {
+      _showErrorDialog('Title and description cannot be empty.');
+      return false;
+    }
+    return true;
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _cancelTask() {
+    Navigator.pop(context); // Close the screen without saving
   }
 
   @override
@@ -50,16 +118,12 @@ class _TaskScreenState extends State<TaskScreen> {
           preferredSize: Size.fromHeight(kToolbarHeight),
           child: TaskBarWidget(),
         ),
-        body: SizedBox(
-          width: double.infinity,
-          height: double.infinity,
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // top side texts
               _buildTopSideTexts(),
-              // main task screen
-              _buildMainTaskScreenActivity(context),
-              // bottom side buttons
+              _buildMainTaskScreenActivity(),
               _buildBottomSideButtons(),
             ],
           ),
@@ -68,62 +132,56 @@ class _TaskScreenState extends State<TaskScreen> {
     );
   }
 
-  // bottom side buttons
   Widget _buildBottomSideButtons() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // cancel button
-          MaterialButton(
-            onPressed: () {},
-            color: AppColors.secondaryColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            height: 50,
-            child: const Row(
-              children: [
-                Icon(
-                  Icons.close,
-                  color: AppColors.buttonColor,
-                ),
-                Text(
-                  TaskStrings.cancelTask,
-                  style: TextStyle(color: AppColors.buttonColor),
-                ),
-              ],
-            ),
-          ),
-          // save button
-          MaterialButton(
-            onPressed: () {},
-            color: AppColors.buttonColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
-            height: 50,
-            child: const Row(
-              children: [
-                Icon(
-                  Icons.save,
-                  color: AppColors.whiteColor,
-                ),
-                Text(
-                  TaskStrings.addTask,
-                  style: TextStyle(color: AppColors.whiteColor),
-                ),
-              ],
-            ),
-          ),
+          _buildCancelButton(),
+          _buildSaveButton(),
         ],
       ),
     );
   }
 
-  // main task screen
-  Widget _buildMainTaskScreenActivity(BuildContext context) {
+  MaterialButton _buildCancelButton() {
+    return MaterialButton(
+      onPressed: _cancelTask,
+      color: AppColors.secondaryColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+      ),
+      height: 50,
+      child: const Row(
+        children: [
+          Icon(Icons.close, color: AppColors.buttonColor),
+          Text(TaskStrings.cancelTask,
+              style: TextStyle(color: AppColors.buttonColor)),
+        ],
+      ),
+    );
+  }
+
+  MaterialButton _buildSaveButton() {
+    return MaterialButton(
+      onPressed: _saveTask,
+      color: AppColors.buttonColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+      ),
+      height: 50,
+      child: const Row(
+        children: [
+          Icon(Icons.save, color: AppColors.whiteColor),
+          Text(TaskStrings.addTask,
+              style: TextStyle(color: AppColors.whiteColor)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainTaskScreenActivity() {
     return SizedBox(
       width: double.infinity,
       height: 540,
@@ -141,67 +199,73 @@ class _TaskScreenState extends State<TaskScreen> {
               ),
             ),
           ),
-          // title input
-          RepTextField(
-            titleController: _titleTaskController,
-          ),
+          RepTextField(titleController: _titleTaskController),
           const SizedBox(height: 40),
-          // description input
           RepTextField(
-            titleController: _descriptionTaskController,
-            isForDescription: true,
-          ),
-          // time select
-          DateTimeSelectionWidget(
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (_) => SizedBox(
-                  height: 280,
-                  child: TimePickerWidget(
-                    initDateTime: DateTime(
-                      selectedDate.year,
-                      selectedDate.month,
-                      selectedDate.day,
-                      selectedTime.hour,
-                      selectedTime.minute,
-                    ),
-                    onConfirm: (dateTime, _) {
-                      setState(() {
-                        selectedTime = TimeOfDay.fromDateTime(dateTime);
-                      });
-                    },
-                  ),
-                ),
-              );
-            },
-            // show formatted time
-            title:
-                '${selectedTime.hourOfPeriod}:${selectedTime.minute.toString().padLeft(2, '0')} ${selectedTime.hour >= 12 ? 'P.M' : 'A.M'}',
-          ),
-          // date select
-          DateTimeSelectionWidget(
-            onTap: () {
-              DatePicker.showDatePicker(
-                context,
-                maxDateTime: DateTime(2050, 12, 31),
-                minDateTime: DateTime.now(),
-                onConfirm: (dateTime, _) {
-                  setState(() {
-                    selectedDate = dateTime;
-                  });
-                },
-              );
-            },
-            // show formatted date
-            title: formatDate(selectedDate),
-          ),
+              titleController: _descriptionTaskController,
+              isForDescription: true),
+          _buildDateTimeSelection(),
         ],
       ),
     );
   }
 
-  // top side texts
+  Widget _buildDateTimeSelection() {
+    return Column(
+      children: [
+        _buildTimeSelection(),
+        _buildDateSelection(),
+      ],
+    );
+  }
+
+  Widget _buildTimeSelection() {
+    return DateTimeSelectionWidget(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          builder: (_) => SizedBox(
+            height: 280,
+            child: TimePickerWidget(
+              initDateTime: DateTime(
+                selectedDate.year,
+                selectedDate.month,
+                selectedDate.day,
+                selectedTime.hour,
+                selectedTime.minute,
+              ),
+              onConfirm: (dateTime, _) {
+                setState(() {
+                  selectedTime = TimeOfDay.fromDateTime(dateTime);
+                });
+              },
+            ),
+          ),
+        );
+      },
+      title:
+          '${selectedTime.hourOfPeriod}:${selectedTime.minute.toString().padLeft(2, '0')} ${selectedTime.hour >= 12 ? 'P.M' : 'A.M'}',
+    );
+  }
+
+  Widget _buildDateSelection() {
+    return DateTimeSelectionWidget(
+      onTap: () {
+        DatePicker.showDatePicker(
+          context,
+          maxDateTime: DateTime(2050, 12, 31),
+          minDateTime: DateTime.now(),
+          onConfirm: (dateTime, _) {
+            setState(() {
+              selectedDate = dateTime;
+            });
+          },
+        );
+      },
+      title: formatDate(selectedDate),
+    );
+  }
+
   Widget _buildTopSideTexts() {
     return SizedBox(
       width: double.infinity,
@@ -212,13 +276,11 @@ class _TaskScreenState extends State<TaskScreen> {
         children: [
           const SizedBox(
             width: 70,
-            child: Divider(
-              thickness: 2,
-            ),
+            child: Divider(thickness: 2),
           ),
           RichText(
             text: TextSpan(
-              text: isTaskAlreadyExists()
+              text: widget.tasks == null
                   ? TaskStrings.addTask
                   : TaskStrings.updateTask,
               style: const TextStyle(
@@ -230,12 +292,15 @@ class _TaskScreenState extends State<TaskScreen> {
           ),
           const SizedBox(
             width: 70,
-            child: Divider(
-              thickness: 2,
-            ),
+            child: Divider(thickness: 2),
           ),
         ],
       ),
     );
+  }
+
+  String formatDate(DateTime dateTime) {
+    // Use your preferred date formatting logic
+    return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
   }
 }

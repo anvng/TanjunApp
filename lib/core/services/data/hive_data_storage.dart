@@ -4,42 +4,78 @@ import 'package:tanjun_app/modules/models/task_model.dart';
 
 // CRUD using Hive Database
 class HiveDataStorage {
-  // box name - string
+  // Box name
   static const boxName = 'TaskBox';
   late Box<TaskModel> box;
 
-  // constructor
-  HiveDataStorage() {
-    _openBox();
+  // Singleton instance
+  static final HiveDataStorage _instance = HiveDataStorage._internal();
+
+  // Private constructor
+  HiveDataStorage._internal();
+
+  // Factory constructor
+  factory HiveDataStorage() {
+    return _instance;
   }
 
-  // open box
+  // Initialize and open the box
+  Future<void> init() async {
+    await _openBox();
+  }
+
+  // Open box
   Future<void> _openBox() async {
-    box = await Hive.openBox<TaskModel>(boxName);
+    try {
+      box = await Hive.openBox<TaskModel>(boxName);
+    } catch (e) {
+      // Handle errors
+      debugPrint('Error opening box: $e');
+    }
   }
 
-  // save data inside box
+  // Save data inside box
   Future<void> addTask({required TaskModel task}) async {
     await box.add(task);
   }
 
-  // show task
-  Future<TaskModel?> getTasks({required String id}) async {
-    return box.get(id);
+  // Show task by index
+  Future<TaskModel?> getTask({required int index}) async {
+    if (index < 0 || index >= box.length) {
+      debugPrint('Invalid index: $index');
+      return null;
+    }
+    return box.getAt(index);
   }
 
-  // update task
-  Future<void> updateTask({required TaskModel task}) async {
-    await box.put(task.id, task);
+  // Get all tasks
+  Future<List<TaskModel>> getAllTasks() async {
+    return box.values.toList();
   }
 
-  // delete task
-  Future<void> deleteTask({required TaskModel task}) async {
-    await box.delete(task.id);
+  // Update task
+  Future<void> updateTask({required int index, required TaskModel task}) async {
+    if (index < 0 || index >= box.length) {
+      debugPrint('Invalid index: $index');
+      return;
+    }
+    await box.putAt(index, task);
   }
 
-  // listen to box changes
-  ValueListenable<Box<TaskModel>> listenToTask() => box.listenable();
+  // Delete task
+  Future<void> deleteTask({required int index}) async {
+    if (index < 0 || index >= box.length) {
+      debugPrint('Invalid index: $index');
+      return;
+    }
+    await box.deleteAt(index);
+  }
 
-  init() {}
+  // Delete all tasks
+  Future<void> deleteAllTasks() async {
+    await box.clear();
+  }
+
+  // Listen to box changes
+  ValueListenable<Box<TaskModel>> listenToTasks() => box.listenable();
 }

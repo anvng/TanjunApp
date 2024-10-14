@@ -5,7 +5,7 @@ import 'package:tanjun_app/core/utils/app_colors.dart';
 class CustomDrawer extends StatelessWidget {
   CustomDrawer({super.key});
 
-  // icons
+  // Icons and titles
   final List<IconData> icons = [
     CupertinoIcons.home,
     CupertinoIcons.person,
@@ -13,12 +13,19 @@ class CustomDrawer extends StatelessWidget {
     CupertinoIcons.info,
   ];
 
-  // titles
   final List<String> titles = [
     "Home",
     "Profile",
     "Settings",
     "Details",
+  ];
+
+  // Define routes
+  final List<String> routes = [
+    '/home',
+    '/profile',
+    '/settings',
+    '/details',
   ];
 
   @override
@@ -51,25 +58,27 @@ class CustomDrawer extends StatelessWidget {
             width: double.infinity,
             height: 300,
             child: ListView.builder(
-                itemCount: icons.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return InkWell(
-                    onTap: () {
-                      debugPrint(titles[index]);
-                    },
-                    child: ListTile(
-                      leading: Icon(
-                        icons[index],
-                        color: const Color.fromARGB(255, 0, 0, 0),
-                      ),
-                      title: Text(
-                        titles[index],
-                        style: const TextStyle(
-                            color: Color.fromARGB(165, 0, 0, 0)),
-                      ),
+              itemCount: icons.length,
+              itemBuilder: (BuildContext context, int index) {
+                return InkWell(
+                  onTap: () {
+                    // Navigate to the corresponding route
+                    Navigator.pushNamed(context, routes[index]);
+                  },
+                  child: ListTile(
+                    leading: Icon(
+                      icons[index],
+                      color: const Color.fromARGB(255, 0, 0, 0),
                     ),
-                  );
-                }),
+                    title: Text(
+                      titles[index],
+                      style:
+                          const TextStyle(color: Color.fromARGB(165, 0, 0, 0)),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
