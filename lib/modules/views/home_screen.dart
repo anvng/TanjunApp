@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:lottie/lottie.dart';
 import 'package:tanjun_app/core/utils/app_colors.dart';
-import 'package:tanjun_app/core/utils/constants.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
 import 'package:tanjun_app/modules/models/task_model.dart';
 import 'package:tanjun_app/modules/viewmodels/custom_drawer.dart';
@@ -52,26 +50,28 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
 
-    // count uncompleted tasks
+    // Count uncompleted tasks
     int incompleteTasksCount = tasks.where((task) => !task.isCompleted).length;
 
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
-      // Fab
       floatingActionButton: Fab(drawerKey: drawerKey),
-
-      // body
       body: SliderDrawer(
         key: drawerKey,
         sliderOpenSize: 250,
-        appBar: BarScreen(drawerKey: drawerKey),
+        appBar: BarScreen(
+          drawerKey: drawerKey,
+          onDeleteAll: () {
+            tasks.clear();
+          },
+        ),
         slider: CustomDrawer(),
         child: SizedBox(
           width: double.infinity,
           height: double.infinity,
           child: Column(
             children: [
-              // header with progress indicator
+              // Header with progress indicator
               Container(
                 margin: const EdgeInsets.only(top: 20),
                 width: double.infinity,
@@ -106,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 3),
-                        // view count of uncompleted tasks
                         Text(
                           "$incompleteTasksCount of ${tasks.length} tasks",
                           style: textTheme.titleMedium?.copyWith(
@@ -153,6 +152,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
+                            confirmDismiss: (direction) async {
+                              return await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text("Confirm Delete"),
+                                    content: const Text(
+                                        "Are you sure you want to delete this task?"),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text("Cancel"),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                      ),
+                                      TextButton(
+                                        child: const Text("Delete"),
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                             onDismissed: (direction) {
                               setState(() {
                                 tasks.removeAt(index);
@@ -170,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               child: ListTile(
                                 onTap: () {
-                                  // toggle completion status
+                                  // Toggle completion status
                                   setState(() {
                                     tasks[index].isCompleted =
                                         !tasks[index].isCompleted;
@@ -182,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: TaskWidget(
                                     task: tasks[index],
                                     onToggle: (isCompleted) {
-                                      // update task status
+                                      // Update task status
                                       setState(() {
                                         tasks[index].isCompleted = isCompleted;
                                       });
@@ -255,33 +278,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       )
-                    : SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // lottie animation
-                            FadeIn(
-                              child: SizedBox(
-                                width: 300,
-                                height: 300,
-                                child: Lottie.asset(
-                                  lottieURL,
-                                  animate: tasks.isNotEmpty ? false : true,
-                                ),
-                              ),
-                            ),
-                            // description
-                            FadeInUp(
-                              child: const Text(
-                                TaskStrings.allTasksCompleted,
-                                style: TextStyle(
-                                  color: Color.fromARGB(157, 33, 58, 87),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w300,
-                                ),
-                              ),
-                            ),
-                          ],
+                    : Center(
+                        child: Lottie.asset(
+                          'assets/lottie/check.json',
+                          width: 300,
+                          height: 300,
+                          fit: BoxFit.fill,
                         ),
                       ),
               ),

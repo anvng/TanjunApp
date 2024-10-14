@@ -4,8 +4,14 @@ import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 import 'package:tanjun_app/core/utils/constants.dart';
 
 class BarScreen extends StatefulWidget {
-  const BarScreen({super.key, required this.drawerKey});
+  const BarScreen({
+    super.key,
+    required this.drawerKey,
+    required this.onDeleteAll,
+  });
+
   final GlobalKey<SliderDrawerState> drawerKey;
+  final VoidCallback onDeleteAll;
 
   @override
   State<BarScreen> createState() => _BarScreenState();
@@ -18,11 +24,11 @@ class _BarScreenState extends State<BarScreen>
 
   @override
   void initState() {
+    super.initState();
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    super.initState();
   }
 
   @override
@@ -44,6 +50,15 @@ class _BarScreenState extends State<BarScreen>
     });
   }
 
+  // View notification before deleting all tasks
+  void deleteAllTasks() {
+    showDeleteAllTasksWarning(context).then((confirmed) {
+      if (confirmed == true) {
+        widget.onDeleteAll();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -57,25 +72,24 @@ class _BarScreenState extends State<BarScreen>
             Padding(
               padding: const EdgeInsets.only(left: 20),
               child: IconButton(
-                  onPressed: onDrawerToggle,
-                  icon: AnimatedIcon(
-                    icon: AnimatedIcons.close_menu,
-                    progress: _animationController,
-                    size: 30,
-                  )),
+                onPressed: onDrawerToggle,
+                icon: AnimatedIcon(
+                  icon: AnimatedIcons.close_menu,
+                  progress: _animationController,
+                  size: 30,
+                ),
+              ),
             ),
-
-            // trash all buttons
+            // Trash all button
             Padding(
               padding: const EdgeInsets.only(right: 20),
               child: IconButton(
-                  onPressed: () {
-                    deleteAllTasksWarning(context);
-                  },
-                  icon: const Icon(
-                    CupertinoIcons.trash_fill,
-                    size: 30,
-                  )),
+                onPressed: deleteAllTasks,
+                icon: const Icon(
+                  CupertinoIcons.trash_fill,
+                  size: 30,
+                ),
+              ),
             ),
           ],
         ),

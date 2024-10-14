@@ -19,7 +19,7 @@ class Fab extends StatelessWidget {
           context,
           CupertinoPageRoute(
             builder: (_) => const TaskScreen(
-              task: null,
+              tasks: null,
               titleTaskController: null,
               descriptionTaskController: null,
             ),

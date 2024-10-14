@@ -1,45 +1,57 @@
-// lottie url
 import 'package:flutter/material.dart';
 import 'package:ftoast/ftoast.dart';
 import 'package:panara_dialogs/panara_dialogs.dart';
 import 'package:tanjun_app/core/utils/task_strings.dart';
 
 String lottieURL = 'assets/lottie/check.json';
-// empty title or description textField warning
-emptyWarning(BuildContext context) {
-  return FToast.toast(
+
+// Generic function to show FToast messages
+void showToast(BuildContext context, String message, String subMessage,
+    {int duration = 3000}) {
+  FToast.toast(
     context,
-    msg: TaskStrings.oopsMessage,
-    subMsg: TaskStrings.mustFillAllFieldsMessage,
+    msg: message,
+    subMsg: subMessage,
     corner: 20,
-    duration: 3000,
+    duration: duration,
     padding: const EdgeInsets.all(20),
   );
 }
 
-// nothing entered when user clicks on add button
-dynamic updateTaskWarning(BuildContext context) {
-  return FToast.toast(
+// Warning for empty title or description textField
+void showEmptyWarning(BuildContext context) {
+  showToast(
     context,
-    msg: TaskStrings.oopsMessage,
-    subMsg: TaskStrings.updateTaskMessage,
-    corner: 20,
+    TaskStrings.oopsMessage,
+    TaskStrings.mustFillAllFieldsMessage,
+  );
+}
+
+// Warning when nothing is entered upon clicking the add button
+void showUpdateTaskWarning(BuildContext context) {
+  showToast(
+    context,
+    TaskStrings.oopsMessage,
+    TaskStrings.updateTaskMessage,
     duration: 4000,
-    padding: const EdgeInsets.all(20),
   );
 }
 
-// no task warning dialog for deleting
-dynamic nothingTaskWarning(BuildContext context) {
-  return PanaraInfoDialog.showAnimatedGrow(context,
-      message: TaskStrings.nothingTaskMessage,
-      buttonText: "Yes", onTapDismiss: () {
-    Navigator.pop(context);
-  }, panaraDialogType: PanaraDialogType.warning);
+// Warning dialog for deleting tasks when none exist
+void showNothingTaskWarning(BuildContext context) {
+  PanaraInfoDialog.showAnimatedGrow(
+    context,
+    message: TaskStrings.nothingTaskMessage,
+    buttonText: "OK",
+    onTapDismiss: () {
+      Navigator.pop(context);
+    },
+    panaraDialogType: PanaraDialogType.warning,
+  );
 }
 
-// delete all tasks
-dynamic deleteAllTasksWarning(BuildContext context) {
+// Confirmation dialog for deleting all tasks
+Future<bool?> showDeleteAllTasksWarning(BuildContext context) {
   return PanaraConfirmDialog.show(
     context,
     title: TaskStrings.confirmationMessage,
@@ -47,10 +59,10 @@ dynamic deleteAllTasksWarning(BuildContext context) {
     confirmButtonText: "Yes",
     cancelButtonText: "No",
     onTapConfirm: () {
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     },
     onTapCancel: () {
-      Navigator.pop(context);
+      Navigator.pop(context, false);
     },
     panaraDialogType: PanaraDialogType.error,
     barrierDismissible: false,

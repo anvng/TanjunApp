@@ -5,32 +5,36 @@ import 'package:tanjun_app/modules/models/task_model.dart';
 import 'package:tanjun_app/modules/views/home_screen.dart';
 
 Future<void> main() async {
-  // initialize hive
+  // Initialize Hive
   await Hive.initFlutter();
 
-  // register hive adapters
+  // Register Hive adapters
   Hive.registerAdapter<TaskModel>(TaskModelAdapter());
 
-  // open box
-  var box = await Hive.openBox<TaskModel>('task_box');
+  // Open the box
+  final box = await Hive.openBox<TaskModel>('task_box');
 
-  // delete tasks from the previous day
-  _deleteOldTasks(box);
+  // Delete tasks from the previous day
+  await _deleteOldTasks(box);
 
-  // run app
+  // Run app
   runApp(BaseWidget(child: const TanjunApp()));
 }
 
-void _deleteOldTasks(Box<TaskModel> box) {
+Future<void> _deleteOldTasks(Box<TaskModel> box) async {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
 
-  for (var task in box.values) {
+  // Collect tasks to delete
+  final tasksToDelete = box.values.where((task) {
     final taskDate =
         DateTime(task.atTime.year, task.atTime.month, task.atTime.day);
-    if (taskDate.isBefore(today)) {
-      task.delete();
-    }
+    return taskDate.isBefore(today);
+  }).toList();
+
+  // Delete tasks
+  for (var task in tasksToDelete) {
+    await task.delete(); // Ensure deletion is awaited
   }
 }
 
