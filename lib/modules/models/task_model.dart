@@ -15,7 +15,7 @@ class TaskModel extends HiveObject {
   });
 
   @HiveField(0)
-  int id;
+  String id;
   @HiveField(1)
   String title;
   @HiveField(2)
@@ -27,7 +27,7 @@ class TaskModel extends HiveObject {
   @HiveField(5)
   bool isCompleted;
 
-  // create a new task
+  // create new task
   factory TaskModel.newTask({
     required String? title,
     required String? description,
@@ -35,7 +35,7 @@ class TaskModel extends HiveObject {
     required DateTime? atDate,
   }) =>
       TaskModel(
-        id: int.parse(const Uuid().v4()),
+        id: const Uuid().v4(),
         title: title ?? '',
         description: description ?? '',
         atTime: atTime ?? DateTime.now(),

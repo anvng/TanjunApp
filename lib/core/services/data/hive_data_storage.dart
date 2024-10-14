@@ -40,4 +40,6 @@ class HiveDataStorage {
 
   // listen to box changes
   ValueListenable<Box<TaskModel>> listenToTask() => box.listenable();
+
+  init() {}
 }

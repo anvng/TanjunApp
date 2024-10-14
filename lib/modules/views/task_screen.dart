@@ -35,6 +35,12 @@ class _TaskScreenState extends State<TaskScreen> {
         _descriptionTaskController.text.isEmpty;
   }
 
+  // format date
+  String formatDate(DateTime date) {
+    final dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    return '${dayOfWeek[date.weekday - 1]}, ${date.day}/${date.month}/${date.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -169,8 +175,9 @@ class _TaskScreenState extends State<TaskScreen> {
                 ),
               );
             },
-            // show current time
-            title: selectedTime.format(context),
+            // show formatted time
+            title:
+                '${selectedTime.hourOfPeriod}:${selectedTime.minute.toString().padLeft(2, '0')} ${selectedTime.hour >= 12 ? 'P.M' : 'A.M'}',
           ),
           // date select
           DateTimeSelectionWidget(
@@ -186,8 +193,8 @@ class _TaskScreenState extends State<TaskScreen> {
                 },
               );
             },
-            // show current date
-            title: "${selectedDate.toLocal()}".split(' ')[0],
+            // show formatted date
+            title: formatDate(selectedDate),
           ),
         ],
       ),
