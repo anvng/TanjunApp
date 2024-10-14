@@ -7,6 +7,7 @@ import 'package:tanjun_app/modules/views/home_screen.dart';
 Future<void> main() async {
   // initialize hive
   await Hive.initFlutter();
+
   // register hive adapters
   Hive.registerAdapter<TaskModel>(TaskModelAdapter());
 
@@ -14,6 +15,13 @@ Future<void> main() async {
   var box = await Hive.openBox<TaskModel>('task_box');
 
   // delete tasks from the previous day
+  _deleteOldTasks(box);
+
+  // run app
+  runApp(BaseWidget(child: const TanjunApp()));
+}
+
+void _deleteOldTasks(Box<TaskModel> box) {
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
 
@@ -24,9 +32,6 @@ Future<void> main() async {
       task.delete();
     }
   }
-
-  // run app
-  runApp(BaseWidget(child: const TanjunApp()));
 }
 
 class BaseWidget extends InheritedWidget {

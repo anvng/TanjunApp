@@ -21,7 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final List<TaskModel> tasks = [
     TaskModel(
-      id: 1,
+      id: '1',
       title: 'Complete homework',
       description: 'Math homework needs to be done.',
       atTime: DateTime.now(),
@@ -29,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       isCompleted: false,
     ),
     TaskModel(
-      id: 2,
+      id: '2',
       title: 'Review chapter 2',
       description: 'Revise the physics notes.',
       atTime: DateTime.now(),
@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
       isCompleted: false,
     ),
     TaskModel(
-      id: 3,
+      id: '3',
       title: 'Complete project proposal',
       description: 'Complete the project proposal.',
       atTime: DateTime.now(),
